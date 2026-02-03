@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <main className="flex flex-col min-h-screen bg-[#01020a]">
       <HeroSection />
-      <HeroSectionNew />
+      {/* <HeroSectionNew /> */}
 
       <div className="relative z-20">
         <AboutUs />
