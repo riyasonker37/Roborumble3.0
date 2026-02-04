@@ -22,10 +22,14 @@ const EventModal = ({ event, onClose }) => {
         
         {/* Close Button */}
         <button 
-          onClick={onClose}
-          className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 text-cyan-400 hover:text-white bg-black/80 rounded-full p-2.5 transition-all hover:scale-110 border border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.8)]"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-2 right-2 sm:top-6 sm:right-6 z-[100] text-cyan-400 hover:text-white bg-black/90 rounded-full p-4 sm:p-2.5 transition-all hover:scale-110 border border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,1)] pointer-events-auto"
+          aria-label="Close Modal"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
 
         {/* --- LEFT SIDE: IMAGE --- */}
