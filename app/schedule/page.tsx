@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import MatrixBackground from "../components/MatrixBackground";
+
 import { SlotText } from "../components/SlotText";
 import Footer from "../components/Footer";
 import { Clock, MapPin, Terminal, Activity, ShieldAlert } from "lucide-react";
@@ -53,9 +53,9 @@ export default function SchedulePage() {
   const playHoverSound = useAudio('audio.wav', 0.1);
 
   return (
-    <main className="min-h-screen bg-black text-white relative overflow-hidden">
+    <main className="min-h-screen bg-transparent text-white relative overflow-hidden">
       {/* Background Matrix Effect */}
-      <MatrixBackground color="#003B00" text="" />
+
 
       <div className="relative z-10 pt-40 pb-20 container mx-auto px-4 md:px-8">
         {/* Page Header */}
@@ -64,7 +64,7 @@ export default function SchedulePage() {
             <div className="h-[2px] w-12 md:w-20 bg-[#FF003C]" />
             <span className="text-[#FF003C] font-mono text-xs md:text-sm font-bold tracking-[0.2em] md:tracking-[0.4em] uppercase">SYNCHRONIZING_SYSTEM_CLOCK</span>
           </div>
-          
+
           <h1 className="text-4xl md:text-6xl lg:text-8xl font-black font-mono tracking-tighter uppercase leading-[0.85] mb-8 break-words">
             <div className="relative inline-block glitch-container">
               <span className="absolute top-0 left-0 text-[#FF003C] mix-blend-screen opacity-70 glitch-layer-red" style={{ transform: 'translate(-0.02em, 0.02em)' }}>
@@ -80,7 +80,7 @@ export default function SchedulePage() {
               <SlotText text="TIMELINE_" className="text-4xl md:text-6xl lg:text-8xl" />
             </div>
           </h1>
-          
+
           <div className="max-w-2xl mx-auto">
             <p className="text-zinc-500 text-lg leading-relaxed font-mono border-l-2 border-[#FF003C] pl-6 py-2 bg-gradient-to-r from-[#FF003C]/5 to-transparent uppercase text-xs">
               Monitor real-time operational schedule. Track all active deployment zones and engagement windows across the campus grid.
@@ -119,7 +119,7 @@ export default function SchedulePage() {
                     <div className="absolute -left-[5px] top-2 w-[10px] h-[10px] bg-black border border-[#00F0FF] group-hover:bg-[#00F0FF] group-hover:shadow-[0_0_10px_#00F0FF] transition-all" />
 
                     {/* Event Card */}
-                    <div 
+                    <div
                       className="relative p-6 bg-zinc-950/50 border border-white/5 hover:border-[#00F0FF]/40 transition-all duration-500 backdrop-blur-md overflow-hidden"
                       style={{ clipPath: 'polygon(0 0, 95% 0, 100% 20%, 100% 100%, 5% 100%, 0 80%)' }}
                     >

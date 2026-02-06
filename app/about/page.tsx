@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import MatrixBackground from "../components/MatrixBackground";
+
 import { SlotText } from "../components/SlotText";
 import Footer from "../components/Footer";
 import { useAudio } from "../hooks/useAudio";
@@ -37,7 +37,7 @@ const AboutCard = ({ data, delay }: { data: CardData; delay: number }) => {
     if (showDetails || isLoading) return; // Prevent re-opening
     setIsLoading(true);
     playOpenSound();
-    
+
     setTimeout(() => {
       setIsLoading(false);
       setShowDetails(true);
@@ -53,14 +53,14 @@ const AboutCard = ({ data, delay }: { data: CardData; delay: number }) => {
   };
 
   return (
-    <div 
-      className="relative group cursor-pointer" 
+    <div
+      className="relative group cursor-pointer"
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Main Preview Card */}
-      <div 
+      <div
         className="relative p-8 bg-black/40 border-l-4 border-t border-[#00F0FF]/50 hover:bg-[#00F0FF]/10 transition-all duration-500 backdrop-blur-sm h-full"
         style={{ clipPath: 'polygon(0 0, 90% 0, 100% 10%, 100% 100%, 10% 100%, 0 90%)' }}
       >
@@ -83,7 +83,7 @@ const AboutCard = ({ data, delay }: { data: CardData; delay: number }) => {
       {(isLoading || showDetails) && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 md:p-4 lg:p-12 pointer-events-none">
           <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" />
-          
+
           <div className="relative w-full max-w-sm md:max-w-3xl lg:max-w-5xl bg-[#050505] border border-[#FF003C] p-1 shadow-[0_0_80px_rgba(255,0,60,0.4)] pointer-events-auto overflow-hidden animate-glitch-entry">
             {/* Top Red Status Bar */}
             <div className="bg-[#FF003C] text-black px-3 md:px-6 py-2 flex justify-between items-center font-mono text-[9px] md:text-[11px] font-black uppercase tracking-widest">
@@ -107,8 +107,8 @@ const AboutCard = ({ data, delay }: { data: CardData; delay: number }) => {
                 <div className="grid md:grid-cols-2 gap-16">
                   <div className="space-y-8">
                     <div className="aspect-video bg-zinc-950 border border-[#FF003C]/30 relative flex items-center justify-center group overflow-hidden">
-                       <span className="text-9xl opacity-20 filter blur-[2px]">{data.icon}</span>
-                       <div className="absolute inset-0 border-[30px] border-transparent border-t-[#FF003C]/5 border-l-[#FF003C]/5" />
+                      <span className="text-9xl opacity-20 filter blur-[2px]">{data.icon}</span>
+                      <div className="absolute inset-0 border-[30px] border-transparent border-t-[#FF003C]/5 border-l-[#FF003C]/5" />
                     </div>
                     <div className="grid grid-cols-2 gap-6 font-mono text-[8px] md:text-[10px]">
                       <div className="p-4 border border-[#FF003C]/20 bg-red-950/5">
@@ -143,10 +143,10 @@ const AboutCard = ({ data, delay }: { data: CardData; delay: number }) => {
                   </div>
                 </div>
               )}
-              
+
               {/* Mobile Close Button at Bottom */}
               <div className="md:hidden border-t border-[#FF003C]/30 p-4">
-                <button 
+                <button
                   onClick={handleClose}
                   className="w-full bg-[#FF003C] text-black py-3 font-black font-mono text-xs uppercase tracking-widest hover:bg-[#FF003C]/80 transition-all"
                 >
@@ -192,18 +192,18 @@ export default function AboutPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-black text-white relative overflow-hidden">
+    <main className="min-h-screen bg-transparent text-white relative overflow-hidden">
       {/* Background Matrix Effect */}
-      <MatrixBackground color="#043352ff" text="" />
-      
+
+
       {/* Navbar Overlay */}
 
       <div className="relative z-10 pt-40 pb-20 container mx-auto px-4 md:px-8">
         {/* Page Header */}
         <div className="mb-20 text-center">
           <div className="flex items-center justify-center gap-4 mb-4">
-             <div className="h-[2px] w-20 bg-[#FF003C]" />
-             <span className="text-[#FF003C] font-mono text-xs md:text-sm font-bold tracking-[0.2em] md:tracking-[0.4em] uppercase">INITIATING_ARCHIVE_RECALL</span>
+            <div className="h-[2px] w-20 bg-[#FF003C]" />
+            <span className="text-[#FF003C] font-mono text-xs md:text-sm font-bold tracking-[0.2em] md:tracking-[0.4em] uppercase">INITIATING_ARCHIVE_RECALL</span>
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-8xl font-black font-mono tracking-tighter uppercase leading-[0.85] mb-8 break-words">
             {/* Multi-layered Glitch Effect - Simplified */}
@@ -228,7 +228,7 @@ export default function AboutPage() {
           </h1>
           <div className="max-w-2xl mx-auto">
             <p className="text-zinc-500 text-lg leading-relaxed font-mono border-l-2 border-[#FF003C] pl-6 py-2 bg-gradient-to-r from-[#FF003C]/5 to-transparent">
-              Robo Rumble evolved from a local collegiate meet into a premier technology frontier. 
+              Robo Rumble evolved from a local collegiate meet into a premier technology frontier.
               Now in its third cycle, we explore the intersection of human creativity and robotic precision.
             </p>
           </div>
@@ -243,7 +243,7 @@ export default function AboutPage() {
 
         {/* Timeline Summary */}
         <div className="bg-zinc-950/50 border border-white/5 p-6 md:p-10 lg:p-16 backdrop-blur-xl relative overflow-hidden"
-             style={{ clipPath: 'polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px)' }}>
+          style={{ clipPath: 'polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px)' }}>
           <div className="relative z-10 grid md:grid-cols-2 gap-8 md:gap-16 items-center">
             <div className="space-y-4 md:space-y-6 text-center md:text-left">
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-white font-mono uppercase tracking-tighter break-words">

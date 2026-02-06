@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import MatrixBackground from "../components/MatrixBackground";
+
 import { Trophy, Users, Info, Shield, Zap, Cpu, Bot, Gamepad2, Mic, Rocket, Magnet, Download } from "lucide-react";
 import { BiFootball } from "react-icons/bi";
 import { SlotText } from "../components/SlotText";
@@ -133,7 +133,7 @@ const EventCard = ({ event, index, registeredEvents, refreshEvents }: { event: E
   };
 
   const handleOptOut = async () => {
-    if(!confirm("CONFIRM_ABORT: Are you sure you want to withdraw from this mission?")) return;
+    if (!confirm("CONFIRM_ABORT: Are you sure you want to withdraw from this mission?")) return;
     setIsRegistering(true);
     try {
       const res = await fetch("/api/events/cancel", {
@@ -338,11 +338,11 @@ const EventCard = ({ event, index, registeredEvents, refreshEvents }: { event: E
                         </div>
                         {isRegistered ? (
                           <div className="w-full flex flex-col items-center gap-4">
-                              <button 
-                                className="w-full max-w-xs py-4 bg-green-600/20 border border-green-500 text-green-500 font-black font-mono tracking-widest transition-colors uppercase text-sm flex items-center justify-center gap-2 cursor-default"
-                                style={{ clipPath: 'polygon(0 0, 95% 0, 100% 30%, 100% 100%, 5% 100%, 0 70%)' }}>
-                                <Shield size={16} /> ALREADY_REGISTERED
-                              </button>
+                            <button
+                              className="w-full max-w-xs py-4 bg-green-600/20 border border-green-500 text-green-500 font-black font-mono tracking-widest transition-colors uppercase text-sm flex items-center justify-center gap-2 cursor-default"
+                              style={{ clipPath: 'polygon(0 0, 95% 0, 100% 30%, 100% 100%, 5% 100%, 0 70%)' }}>
+                              <Shield size={16} /> ALREADY_REGISTERED
+                            </button>
                           </div>
                         ) : (
                           <Link href={`/events/register?eventId=${event.id}`}>
@@ -353,7 +353,7 @@ const EventCard = ({ event, index, registeredEvents, refreshEvents }: { event: E
                             </button>
                           </Link>
                         )}
-                        
+
                         {/* Brochure Link Removed: File not found */}
                         {/* 
                         <a href="/brochure.pdf" download className="w-full max-w-xs opacity-50 cursor-not-allowed">
@@ -407,8 +407,8 @@ export default function EventsPage() {
 
 
   return (
-    <main className="min-h-screen bg-black text-white relative overflow-hidden">
-      <MatrixBackground color="#003B00" text="" />
+    <main className="min-h-screen bg-transparent text-white relative overflow-hidden">
+
 
       <div className="relative z-10 pt-40 pb-32 container mx-auto px-4 md:px-8">
         {/* Page Header */}
@@ -446,12 +446,12 @@ export default function EventsPage() {
         {/* Dynamic Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {events.map((event: any, i: number) => (
-            <EventCard 
-                key={event.id} 
-                event={event} 
-                index={i} 
-                registeredEvents={registeredEvents}
-                refreshEvents={fetchUserData}
+            <EventCard
+              key={event.id}
+              event={event}
+              index={i}
+              registeredEvents={registeredEvents}
+              refreshEvents={fetchUserData}
             />
           ))}
         </div>

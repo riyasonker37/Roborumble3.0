@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import MatrixBackground from "../components/MatrixBackground";
+
 import { SlotText } from "../components/SlotText";
 import Footer from "../components/Footer";
 import { useAudio } from "../hooks/useAudio";
@@ -118,10 +118,10 @@ const SponsorCard = ({ sponsor, delay }: { sponsor: SponsorData; delay: number }
                     </p>
 
                     <div className="mb-8">
-                       <h5 className="text-[#00F0FF] font-mono text-[10px] mb-2 uppercase tracking-[0.3em] font-bold">Operational_Role:</h5>
-                       <p className="text-zinc-500 font-mono text-xs leading-relaxed">
-                         {sponsor.operationalRole}
-                       </p>
+                      <h5 className="text-[#00F0FF] font-mono text-[10px] mb-2 uppercase tracking-[0.3em] font-bold">Operational_Role:</h5>
+                      <p className="text-zinc-500 font-mono text-xs leading-relaxed">
+                        {sponsor.operationalRole}
+                      </p>
                     </div>
 
                     <div className="mt-auto pt-6 border-t border-zinc-900">
@@ -153,8 +153,8 @@ const SponsorCard = ({ sponsor, delay }: { sponsor: SponsorData; delay: number }
 
 export default function SponsorsPage() {
   return (
-    <main className="min-h-screen bg-black text-white relative overflow-hidden">
-      <MatrixBackground color="#003B00" text="" />
+    <main className="min-h-screen bg-transparent text-white relative overflow-hidden">
+
 
       <div className="relative z-10 pt-40 pb-20 container mx-auto px-4 md:px-8">
         {/* Page Header */}

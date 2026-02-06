@@ -6,6 +6,7 @@ import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import CustomCursor from "@/components/CustomCursor";
+import ParticleBackground from "./components/ParticleBackground";
 
 export default function RootLayout({
   children,
@@ -23,14 +24,14 @@ export default function RootLayout({
 
   return (
     <ClerkProvider>
-      <html lang="en" className="bg-black">
+      <html lang="en">
         <head>
           <title>ROBO RUMBLE | The Ultimate Robotics Showdown</title>
           <meta name="description" content="Join Robo Rumble 3.0 at CSJMU. The Ultimate Robotics Competition." />
           <link rel="icon" href="/skull.png" />
         </head>
         <body>
-          <CustomCursor />
+          <ParticleBackground />
           <AuthProvider>
             {showNavbar && <Navbar />}
             {children}
