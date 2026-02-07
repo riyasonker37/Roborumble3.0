@@ -17,6 +17,7 @@ import {
     Zap,
     ChevronRight,
 } from "lucide-react";
+import NotificationBell from "@/app/components/NotificationBell";
 
 const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: Home, color: "cyan" },
@@ -126,6 +127,12 @@ export default function DashboardLayout({
 
                 {/* Bottom Section */}
                 <div className="p-3 border-t border-gray-800/50 space-y-2">
+                    {/* Notification Bell */}
+                    <div className="flex items-center justify-between p-2">
+                        <span className="text-gray-500 text-xs font-medium uppercase tracking-wider">Notifications</span>
+                        <NotificationBell />
+                    </div>
+
                     {/* User Profile */}
                     <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-xl">
                         <UserButton afterSignOutUrl="/" />
