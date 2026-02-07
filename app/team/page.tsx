@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
-
-import { SlotText } from "../components/SlotText";
+import Navbar from "../components/Navbar";
+import MatrixBackground from "../components/MatrixBackground";
 import Footer from "../components/Footer";
 import Image from "next/image";
 import Link from "next/link";
@@ -257,32 +256,10 @@ const AssetCard = ({ member, delay }: { member: TeamMember; delay: number }) => 
 
 // --- Main TeamPage ---
 export default function TeamPage() {
-  const studentCoordinators = [
-    { name: "Raju Ranjan Yadav", role: "Lead Student Coordinator", dept: "Robo Rumble Core", image: "/Raju.jpeg" },
-    { name: "Devanshu Verma", role: "Technical Student Coordinator", dept: "Robo Rumble Core", image: "/devanshu.jpeg" },
-    { name: "Qaaid Iqbal Badri", role: "Strategic Student Coordinator", dept: "Robo Rumble Core", image: "/qaaid.jpeg" },
-    { name: "Ayush kanoujiya", role: "Student Coordinator", dept: "Robo Rumble Core", image: "/Ayush.jpeg" },
-  ];
-
-  const eventManagement = [
-    { name: "Nikhil Shines", role: "Event Manager", dept: "Management", image: "/Nikhil.jpeg" },
-    { name: "Mukesh Yadav", role: "Event Manager", dept: "Management", image: "/mukesh.jpeg" },
-    { name: "Vaishnavi Pal", role: "Event Manager", dept: "Management", image: "/Vaishnavi2.jpeg" },
-  ];
-
-  const technicalLeads = [
-    { name: "Anant Tirupati", role: "Technical Lead", dept: "Technical", image: "/skull.png" },
-    { name: "Aakshant Kumar", role: "Technical Lead", dept: "Technical", image: "/skull.png" },
-  ];
-
-  const mediaPR = [
-    { name: "Lucky Kumar", role: "Media PR Head", dept: "Media & PR", image: "/lucky.jpeg" },
-    { name: "Mukesh Nishad", role: "Media PR Head", dept: "Media & PR", image: "/skull.png" },
-  ];
-
   return (
-    <main className="min-h-screen bg-transparent text-white relative overflow-hidden">
-
+    <main className="min-h-screen bg-black text-white relative overflow-hidden">
+      <MatrixBackground color="#003B00" text="" />
+      <Navbar />
 
       <div className="relative z-10 pt-40 pb-20 container mx-auto px-4 md:px-8">
         {/* Header */}
@@ -360,40 +337,6 @@ export default function TeamPage() {
       </div>
 
       <Footer />
-
-      <style jsx global>{`
-        @keyframes scan { 0% { top: -20%; } 100% { top: 120%; } }
-        .animate-scan { position: absolute; animation: scan 2s linear infinite; }
-        @keyframes glitch-entry {
-          0% { opacity: 0; transform: scale(0.98) skewX(-5deg); filter: brightness(2); }
-          50% { opacity: 1; transform: scale(1.02) skewX(2deg); filter: brightness(1.2); }
-          100% { transform: scale(1) skewX(0); filter: brightness(1); }
-        }
-        .animate-glitch-entry { animation: glitch-entry 0.4s ease-out forwards; }
-        .glitch-container { animation: glitch-skew 3s infinite; }
-        @keyframes glitch-skew {
-          0%, 100% { transform: skew(0deg); }
-          20% { transform: skew(0deg); }
-          21% { transform: skew(-0.6deg); }
-          22% { transform: skew(0deg); }
-        }
-        .glitch-layer-red { animation: glitch-clip-red 2.5s infinite; }
-        .glitch-layer-cyan { animation: glitch-clip-cyan 2s infinite; }
-        @keyframes glitch-clip-red {
-          0%, 100% { clip-path: inset(0 0 0 0); }
-          11% { clip-path: inset(22% 0 58% 0); }
-          12% { clip-path: inset(0 0 0 0); }
-          51% { clip-path: inset(42% 0 28% 0); }
-          52% { clip-path: inset(0 0 0 0); }
-        }
-        @keyframes glitch-clip-cyan {
-          0%, 100% { clip-path: inset(0 0 0 0); }
-          16% { clip-path: inset(32% 0 48% 0); }
-          17% { clip-path: inset(0 0 0 0); }
-          66% { clip-path: inset(12% 0 68% 0); }
-          67% { clip-path: inset(0 0 0 0); }
-        }
-      `}</style>
     </main>
   );
 }
