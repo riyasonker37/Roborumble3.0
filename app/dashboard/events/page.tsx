@@ -3,9 +3,11 @@
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Trophy, Users, Shield, Zap, Cpu, Bot, Gamepad2, Mic, Rocket, Magnet, CheckCircle, Clock, Loader2, Calendar, MapPin, ArrowRight } from "lucide-react";
+import { Trophy, Users, Shield, Zap, Cpu, Bot, Gamepad2, Mic, Rocket, Magnet, CheckCircle, Clock, Loader2, Calendar, MapPin, ArrowRight, ShoppingCart, Plus } from "lucide-react";
 import { BiFootball } from "react-icons/bi";
 import { useAudio } from "@/app/hooks/useAudio";
+import CartSidebar, { CartIconButton } from "@/app/components/CartSidebar";
+import NotificationBell from "@/app/components/NotificationBell";
 
 declare global {
     interface Window {
@@ -66,17 +68,21 @@ const formatDate = (dateStr?: string) => {
 const HorizontalEventCard = ({
     event,
     registration,
-    onRegister,
-    teamData
+    onAddToCart,
+    teamData,
+    isInCart,
+    addingToCart
 }: {
     event: EventData;
     registration?: RegistrationStatus;
-    onRegister: (eventId: string, cost: number, teamId?: string, selectedMembers?: string[]) => void;
+    onAddToCart: (eventId: string, teamId?: string, selectedMembers?: string[]) => void;
     teamData: any;
+    isInCart: boolean;
+    addingToCart: boolean;
 }) => {
     const [showRosterDialog, setShowRosterDialog] = useState(false);
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-    
+
     const isRegistered = !!registration;
     const isPaid = registration?.status === "paid";
     const Icon = getEventIcon(event.category, event.eventId);
@@ -98,23 +104,23 @@ const HorizontalEventCard = ({
             alert("This event requires a team. Please create a team in the 'Team' tab first.");
             return;
         }
-        
+
         // Check if user is team leader for team events
         if (isTeamEvent && teamData?.team) {
-            const isLeader = teamData.team.leaderId === teamData.profileId || 
-                           teamData.team.leaderId?._id === teamData.profileId ||
-                           teamData.team.leaderId === teamData.profile?._id;
-            
+            const isLeader = teamData.team.leaderId === teamData.profileId ||
+                teamData.team.leaderId?._id === teamData.profileId ||
+                teamData.team.leaderId === teamData.profile?._id;
+
             if (!isLeader) {
-                alert("Only the team leader can register for team events.");
+                alert("Only the team leader can add team events to cart.");
                 return;
             }
-            
+
             // Show roster selection dialog
             setShowRosterDialog(true);
         } else {
-            // Individual event - register directly
-            onRegister(event.eventId, event.fees);
+            // Individual event - add to cart directly
+            onAddToCart(event.eventId);
         }
     };
 
@@ -123,7 +129,7 @@ const HorizontalEventCard = ({
             alert("Please select at least one member");
             return;
         }
-        onRegister(event.eventId, event.fees, teamData?.team?._id, selectedMembers);
+        onAddToCart(event.eventId, teamData?.team?._id, selectedMembers);
         setShowRosterDialog(false);
     };
 
@@ -213,19 +219,26 @@ const HorizontalEventCard = ({
                             <button disabled className="w-full px-4 py-2 bg-green-500/10 border border-green-500/50 text-green-400 font-bold font-mono text-xs rounded-lg uppercase flex items-center justify-center gap-2 cursor-default">
                                 <CheckCircle size={14} /> Registered
                             </button>
-                        ) : isRegistered && event.fees > 0 ? (
+                        ) : isInCart ? (
                             <button
-                                onClick={() => onRegister(event.eventId, event.fees)}
-                                className="w-full px-4 py-2 bg-yellow-500/10 border border-yellow-500/50 text-yellow-400 font-bold font-mono text-xs rounded-lg uppercase flex items-center justify-center gap-2 hover:bg-yellow-500/20 transition-all"
+                                disabled
+                                className="w-full px-4 py-2 bg-[#00F0FF]/10 border border-[#00F0FF]/50 text-[#00F0FF] font-bold font-mono text-xs rounded-lg uppercase flex items-center justify-center gap-2 cursor-default"
                             >
-                                <Clock size={14} /> Pay Now
+                                <ShoppingCart size={14} /> In Cart
+                            </button>
+                        ) : addingToCart ? (
+                            <button
+                                disabled
+                                className="w-full px-4 py-2 bg-zinc-800 text-zinc-400 font-bold font-mono text-xs rounded-lg uppercase flex items-center justify-center gap-2"
+                            >
+                                <Loader2 size={14} className="animate-spin" /> Adding...
                             </button>
                         ) : (
                             <button
                                 onClick={handleRegisterClick}
                                 className="w-full px-4 py-2 bg-white text-black font-black font-mono text-xs rounded-lg uppercase hover:bg-[#00F0FF] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:shadow-[0_0_20px_rgba(0,240,255,0.4)]"
                             >
-                                Register <ArrowRight size={14} />
+                                <Plus size={14} /> Add to Cart
                             </button>
                         )}
                     </div>
@@ -260,11 +273,10 @@ const HorizontalEventCard = ({
                             {teamData?.team?.members?.map((member: any) => (
                                 <label
                                     key={member._id}
-                                    className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-all ${
-                                        selectedMembers.includes(member._id)
-                                            ? "bg-[#00F0FF]/10 border-[#00F0FF]"
-                                            : "bg-zinc-900/50 border-zinc-800 hover:border-zinc-600"
-                                    }`}
+                                    className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-all ${selectedMembers.includes(member._id)
+                                        ? "bg-[#00F0FF]/10 border-[#00F0FF]"
+                                        : "bg-zinc-900/50 border-zinc-800 hover:border-zinc-600"
+                                        }`}
                                 >
                                     <input
                                         type="checkbox"
@@ -280,9 +292,8 @@ const HorizontalEventCard = ({
                                             }
                                         }}
                                     />
-                                    <div className={`w-4 h-4 border flex items-center justify-center ${
-                                        selectedMembers.includes(member._id) ? "border-[#00F0FF] bg-[#00F0FF]" : "border-zinc-600"
-                                    }`}>
+                                    <div className={`w-4 h-4 border flex items-center justify-center ${selectedMembers.includes(member._id) ? "border-[#00F0FF] bg-[#00F0FF]" : "border-zinc-600"
+                                        }`}>
                                         {selectedMembers.includes(member._id) && <div className="w-2 h-2 bg-black" />}
                                     </div>
                                     <span className="text-sm font-mono text-white">{member.username || member.email}</span>
@@ -319,28 +330,24 @@ export default function DashboardEventsPage() {
     const [registeredEvents, setRegisteredEvents] = useState<RegistrationStatus[]>([]);
     const [teamData, setTeamData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [registering, setRegistering] = useState<string | null>(null);
+    const [addingToCart, setAddingToCart] = useState<string | null>(null);
     const [message, setMessage] = useState({ type: "", text: "" });
+
+    // Cart state
+    const [cartItems, setCartItems] = useState<string[]>([]);
+    const [cartCount, setCartCount] = useState(0);
+    const [cartOpen, setCartOpen] = useState(false);
 
     useEffect(() => {
         fetchEvents();
         if (user?.id) {
             fetchRegistrationStatus();
             fetchTeamData();
+            fetchCart();
         }
     }, [user?.id]);
 
-    useEffect(() => {
-        const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
-        script.async = true;
-        document.body.appendChild(script);
-        return () => {
-            if (document.body.contains(script)) {
-                document.body.removeChild(script);
-            }
-        };
-    }, []);
+
 
     async function fetchEvents() {
         try {
@@ -389,13 +396,27 @@ export default function DashboardEventsPage() {
         }
     }
 
+    async function fetchCart() {
+        try {
+            const res = await fetch("/api/cart");
+            if (res.ok) {
+                const data = await res.json();
+                const eventIds = data.items?.map((item: any) => item.eventId?.eventId || item.eventId) || [];
+                setCartItems(eventIds);
+                setCartCount(data.itemCount || 0);
+            }
+        } catch (e) {
+            console.error("Failed to fetch cart", e);
+        }
+    }
+
     function getRegistrationStatus(eventId: string): RegistrationStatus | undefined {
         return registeredEvents.find(r => r.eventId === eventId);
     }
 
-    async function handleRegister(eventId: string, cost: number, teamId?: string, selectedMembers?: string[]) {
+    async function handleAddToCart(eventId: string, teamId?: string, selectedMembers?: string[]) {
         if (!user?.id) return;
-        setRegistering(eventId);
+        setAddingToCart(eventId);
         setMessage({ type: "", text: "" });
 
         try {
@@ -405,83 +426,30 @@ export default function DashboardEventsPage() {
                 payload.selectedMembers = selectedMembers;
             }
 
-            const registerRes = await fetch("/api/events/register", {
+            const res = await fetch("/api/cart", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
             });
 
-            if (!registerRes.ok) {
-                const data = await registerRes.json();
-                throw new Error(data.error || data.message || "Registration failed");
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to add to cart");
             }
 
-            if (cost === 0) {
-                setMessage({ type: "success", text: "Successfully registered for free event!" });
-                await fetchRegistrationStatus();
-                return;
-            }
-
-            const orderRes = await fetch("/api/payments/create-order", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ clerkId: user.id, eventId }),
-            });
-
-            const orderData = await orderRes.json();
-
-            if (!orderRes.ok) {
-                throw new Error(orderData.message || "Failed to create payment order");
-            }
-
-            if (orderData.isFree) {
-                setMessage({ type: "success", text: "Successfully registered!" });
-                await fetchRegistrationStatus();
-                return;
-            }
-
-            const options = {
-                key: orderData.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-                amount: orderData.amount,
-                currency: orderData.currency || "INR",
-                name: "Robo Rumble",
-                description: `Registration for ${orderData.eventTitle || eventId}`,
-                order_id: orderData.orderId,
-                handler: async function (response: {
-                    razorpay_order_id: string;
-                    razorpay_payment_id: string;
-                    razorpay_signature: string;
-                }) {
-                    const verifyRes = await fetch("/api/payments/verify", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ ...response, eventId }),
-                    });
-                    const verifyData = await verifyRes.json();
-                    if (verifyRes.ok) {
-                        setMessage({ type: "success", text: "Payment successful! You are registered." });
-                        await fetchRegistrationStatus();
-                    } else {
-                        setMessage({ type: "error", text: verifyData.message || "Payment verification failed" });
-                    }
-                },
-                prefill: {
-                    name: user.fullName || "",
-                    email: user.emailAddresses?.[0]?.emailAddress || "",
-                },
-                theme: {
-                    color: "#06b6d4",
-                },
-            };
-
-            const rzp = new window.Razorpay(options);
-            rzp.open();
+            setMessage({ type: "success", text: `${data.eventTitle || eventId} added to cart!` });
+            await fetchCart();
         } catch (e) {
             console.error(e);
             setMessage({ type: "error", text: e instanceof Error ? e.message : "Something went wrong" });
         } finally {
-            setRegistering(null);
+            setAddingToCart(null);
         }
+    }
+
+    function isEventInCart(eventId: string): boolean {
+        return cartItems.includes(eventId);
     }
 
     if (loading) return (
@@ -503,14 +471,14 @@ export default function DashboardEventsPage() {
                     </p>
                 </div>
 
-                {/* Filter Pills (Visual Only for now) */}
-                <div className="flex flex-wrap gap-2">
+                {/* Cart Icon Button */}
+                <div className="flex flex-wrap gap-2 items-center">
                     {["Upcoming", "Nearby", "Past", "Yours"].map((filter, i) => (
                         <button
                             key={filter}
                             className={`px-4 py-2 rounded-full text-xs font-bold font-mono transition-all ${i === 0
-                                    ? "bg-[#eab308] text-black hover:bg-[#eab308]/90"
-                                    : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-white"
+                                ? "bg-[#eab308] text-black hover:bg-[#eab308]/90"
+                                : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-white"
                                 }`}
                         >
                             {filter}
@@ -519,6 +487,8 @@ export default function DashboardEventsPage() {
                     <button className="p-2 bg-[#eab308] rounded-lg text-black hover:bg-[#eab308]/90 transition-all ml-2">
                         <Calendar size={16} />
                     </button>
+                    <NotificationBell />
+                    <CartIconButton onClick={() => setCartOpen(true)} itemCount={cartCount} />
                 </div>
             </div>
 
@@ -532,7 +502,7 @@ export default function DashboardEventsPage() {
             )}
 
             {/* Overloading screen if registering */}
-            {registering && (
+            {addingToCart && (
                 <div className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-md flex items-center justify-center">
                     <div className="flex flex-col items-center bg-black border border-[#00F0FF]/30 p-8 rounded-2xl shadow-[0_0_50px_rgba(0,240,255,0.2)]">
                         <Loader2 className="animate-spin text-[#00F0FF]" size={48} />
@@ -552,12 +522,24 @@ export default function DashboardEventsPage() {
                             key={event.eventId}
                             event={event}
                             registration={getRegistrationStatus(event.eventId)}
-                            onRegister={handleRegister}
+                            onAddToCart={handleAddToCart}
                             teamData={teamData}
+                            isInCart={isEventInCart(event.eventId)}
+                            addingToCart={addingToCart === event.eventId}
                         />
                     ))}
                 </div>
             )}
+
+            {/* Cart Sidebar */}
+            <CartSidebar
+                isOpen={cartOpen}
+                onClose={() => setCartOpen(false)}
+                onCartUpdate={(count) => {
+                    setCartCount(count);
+                    fetchCart();
+                }}
+            />
         </div>
     );
 }

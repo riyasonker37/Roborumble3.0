@@ -128,7 +128,7 @@ export default function NotificationBell({ className = "" }: NotificationBellPro
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -10, scale: 0.95 }}
                             transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
-                            className="absolute left-0 mt-2 w-72 bg-gray-900 border border-gray-700/50 rounded-xl shadow-2xl z-50 overflow-hidden"
+                            className="fixed md:absolute right-4 md:right-0 left-4 md:left-auto mt-2 md:w-80 bg-gray-900 border border-gray-700/50 rounded-xl shadow-2xl z-50 overflow-hidden max-h-[80vh] md:max-h-[400px]"
                         >
                             {/* Header */}
                             <div className="px-4 py-3 border-b border-gray-700/50 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">

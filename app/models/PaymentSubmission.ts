@@ -1,0 +1,62 @@
+import mongoose, { Schema, Document, Model } from "mongoose";
+
+interface IPaymentEvent {
+    eventId: mongoose.Types.ObjectId;
+    selectedMembers: mongoose.Types.ObjectId[];
+}
+
+export interface IPaymentSubmission extends Document {
+    clerkId: string;
+    cartId?: mongoose.Types.ObjectId;
+    teamId?: mongoose.Types.ObjectId;
+    transactionId: string;
+    screenshotUrl: string;
+    totalAmount: number;
+    events: IPaymentEvent[];
+    status: "pending" | "verified" | "rejected";
+    verifiedBy?: string;
+    verifiedAt?: Date;
+    rejectionReason?: string;
+    leaderEmail: string;
+    leaderName: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const PaymentSubmissionSchema = new Schema<IPaymentSubmission>(
+    {
+        clerkId: { type: String, required: true, index: true },
+        cartId: { type: Schema.Types.ObjectId, ref: "Cart" },
+        teamId: { type: Schema.Types.ObjectId, ref: "Team" },
+        transactionId: { type: String, required: true },
+        screenshotUrl: { type: String, required: true },
+        totalAmount: { type: Number, required: true },
+        events: [
+            {
+                eventId: { type: Schema.Types.ObjectId, ref: "Event", required: true },
+                selectedMembers: [{ type: Schema.Types.ObjectId, ref: "Profile" }],
+            },
+        ],
+        status: {
+            type: String,
+            enum: ["pending", "verified", "rejected"],
+            default: "pending",
+            index: true,
+        },
+        verifiedBy: { type: String },
+        verifiedAt: { type: Date },
+        rejectionReason: { type: String },
+        leaderEmail: { type: String, required: true },
+        leaderName: { type: String, required: true },
+    },
+    { timestamps: true }
+);
+
+// Compound index for faster admin queries
+PaymentSubmissionSchema.index({ status: 1, createdAt: -1 });
+
+const PaymentSubmission: Model<IPaymentSubmission> =
+    mongoose.models.PaymentSubmission ||
+    mongoose.model<IPaymentSubmission>("PaymentSubmission", PaymentSubmissionSchema);
+
+export default PaymentSubmission;
