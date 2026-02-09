@@ -89,6 +89,7 @@ export async function POST(req: Request) {
             verifiedAt: isFree ? new Date() : undefined,
             leaderEmail: profile.email,
             leaderName: profile.username || profile.email,
+            leaderPhone: profile.phone || "N/A",
         });
 
         // Create registrations for each event

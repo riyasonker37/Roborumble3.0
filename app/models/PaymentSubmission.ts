@@ -19,6 +19,7 @@ export interface IPaymentSubmission extends Document {
     rejectionReason?: string;
     leaderEmail: string;
     leaderName: string;
+    leaderPhone: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -48,6 +49,7 @@ const PaymentSubmissionSchema = new Schema<IPaymentSubmission>(
         rejectionReason: { type: String },
         leaderEmail: { type: String, required: true },
         leaderName: { type: String, required: true },
+        leaderPhone: { type: String, required: true },
     },
     { timestamps: true }
 );

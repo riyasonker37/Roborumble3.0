@@ -36,6 +36,7 @@ interface PaymentSubmission {
     status: "pending" | "verified" | "rejected";
     leaderEmail: string;
     leaderName: string;
+    leaderPhone: string;
     teamId?: { name: string };
     rejectionReason?: string;
     createdAt: string;
@@ -252,7 +253,10 @@ export default function AdminPaymentsPage() {
                                             <div>
                                                 <span className="text-zinc-500 block text-xs uppercase mb-1">Leader</span>
                                                 <span className="text-white font-bold">{sub.leaderName}</span>
-                                                <span className="text-zinc-400 block text-xs">{sub.leaderEmail}</span>
+                                                <div className="flex flex-col text-xs">
+                                                    <span className="text-zinc-400">{sub.leaderEmail}</span>
+                                                    <span className="text-[#00F0FF] mt-0.5">{sub.leaderPhone}</span>
+                                                </div>
                                             </div>
                                             <div>
                                                 <span className="text-zinc-500 block text-xs uppercase mb-1">Team</span>

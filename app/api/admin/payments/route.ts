@@ -44,7 +44,19 @@ export async function GET(req: Request) {
                 select: "name",
             })
             .sort({ createdAt: -1 })
-            .limit(100);
+            .limit(100)
+            .lean();
+
+        // Add fallback for leaderPhone if missing in older records
+        const submissionsWithPhone = await Promise.all(
+            submissions.map(async (sub: any) => {
+                if (!sub.leaderPhone) {
+                    const profile = await Profile.findOne({ clerkId: sub.clerkId }).select("phone");
+                    return { ...sub, leaderPhone: profile?.phone || "N/A" };
+                }
+                return sub;
+            })
+        );
 
         const stats = {
             pending: await PaymentSubmission.countDocuments({ status: "pending" }),
@@ -53,7 +65,7 @@ export async function GET(req: Request) {
         };
 
         return NextResponse.json({
-            submissions,
+            submissions: submissionsWithPhone,
             stats,
         });
     } catch (error) {
