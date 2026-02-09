@@ -9,6 +9,10 @@ export interface IProfile extends Document {
     username?: string;
     bio?: string;
     phone?: string;
+    college?: string;
+    city?: string;
+    state?: string;
+    degree?: string;
     branch?: string;
     yearOfStudy?: number;
     role: "user" | "admin" | "superadmin";

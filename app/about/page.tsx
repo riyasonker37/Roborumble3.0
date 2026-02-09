@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import MatrixBackground from "../components/MatrixBackground";
 import { SlotText } from "../components/SlotText";
 import Footer from "../components/Footer";
@@ -66,7 +66,7 @@ const AboutCard = ({ data, delay }: { data: CardData; delay: number }) => {
         style={{ clipPath: 'polygon(0 0, 90% 0, 100% 10%, 100% 100%, 10% 100%, 0 90%)' }}
       >
         <div className="text-[#00F0FF] font-mono text-[10px] mb-4 opacity-50 tracking-tighter uppercase relative z-10">
-          // SUBJECT_ID: {data.title.replace(/\s+/g, '_')}
+          {"// SUBJECT_ID: "}{data.title.replace(/\s+/g, '_')}
         </div>
         
         {data.image ? (
@@ -248,7 +248,7 @@ export default function AboutPage() {
           </h1>
           <div className="max-w-2xl mx-auto">
             <p className="text-zinc-500 text-lg leading-relaxed font-mono border-l-2 border-[#FF003C] pl-6 py-2 bg-gradient-to-r from-[#FF003C]/5 to-transparent">
-              Robo Rumble is UIET’s flagship technical event dedicated to robotics, innovation, and hands-on engineering experience. It
+              Robo Rumble is UIET&apos;s flagship technical event dedicated to robotics, innovation, and hands-on engineering experience. It
               provides a platform for students to explore emerging technologies, apply theoretical knowledge to real-world challenges, and work
               collaboratively in a competitive yet learning-focused environment.
               <br /><br />

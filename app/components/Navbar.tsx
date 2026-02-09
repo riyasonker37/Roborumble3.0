@@ -237,8 +237,8 @@ const Navbar = () => {
 
           {/* Decorative System Text */}
           <div className="pt-8 pb-24 space-y-2 px-6 opacity-30">
-            <p className="text-[#00E5FF] font-mono text-[9px] tracking-widest">// ROBO_RUMBLE_v3.0</p>
-            <p className="text-[#00E5FF] font-mono text-[9px] tracking-widest">// SYSTEM_ONLINE</p>
+            <p className="text-[#00E5FF] font-mono text-[9px] tracking-widest">{"// ROBO_RUMBLE_v3.0"}</p>
+            <p className="text-[#00E5FF] font-mono text-[9px] tracking-widest">{"// SYSTEM_ONLINE"}</p>
           </div>
         </div>
 

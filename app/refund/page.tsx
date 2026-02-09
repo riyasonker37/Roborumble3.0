@@ -1,6 +1,6 @@
 import React from "react";
 import { AlertCircle } from "lucide-react";
-import Footer from "@/components/Footer";
+import Footer from "@/app/components/Footer";
 
 export default function RefundPage() {
     return (

@@ -45,7 +45,7 @@ export async function GET(req: Request) {
 
         // Find matching users
         let users = await Profile.find(searchFilter)
-            .select("_id username email firstName lastName avatarUrl college course")
+            .select("_id username email firstName lastName avatarUrl college degree branch")
             .limit(15);
 
         // If excludeInTeam is true, filter out users who are already in a team
@@ -83,7 +83,8 @@ export async function GET(req: Request) {
             fullName: [u.firstName, u.lastName].filter(Boolean).join(" ") || u.username || "Unknown",
             avatarUrl: u.avatarUrl,
             college: u.college,
-            course: u.course,
+            degree: u.degree,
+            branch: u.branch,
         }));
 
         return NextResponse.json({
