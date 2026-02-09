@@ -88,7 +88,9 @@ export async function POST(req: Request) {
             verifiedBy: isFree ? "SYSTEM" : undefined,
             verifiedAt: isFree ? new Date() : undefined,
             leaderEmail: profile.email,
-            leaderName: profile.username || profile.email,
+            leaderName: profile.firstName && profile.lastName 
+                ? `${profile.firstName} ${profile.lastName}` 
+                : profile.username || profile.email,
             leaderPhone: profile.phone || "N/A",
         });
 

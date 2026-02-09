@@ -43,18 +43,29 @@ export async function GET(req: Request) {
                 model: Team,
                 select: "name",
             })
+            .populate({
+                path: "events.selectedMembers",
+                model: Profile,
+                select: "firstName lastName username",
+            })
             .sort({ createdAt: -1 })
             .limit(100)
             .lean();
 
-        // Add fallback for leaderPhone if missing in older records
-        const submissionsWithPhone = await Promise.all(
+        // Enrich with leaderFullName and handle fallback for leaderPhone
+        const enrichedSubmissions = await Promise.all(
             submissions.map(async (sub: any) => {
-                if (!sub.leaderPhone) {
-                    const profile = await Profile.findOne({ clerkId: sub.clerkId }).select("phone");
-                    return { ...sub, leaderPhone: profile?.phone || "N/A" };
-                }
-                return sub;
+                const profile = await Profile.findOne({ clerkId: sub.clerkId }).select("firstName lastName username phone");
+
+                const leaderFullName = profile
+                    ? [profile.firstName, profile.lastName].filter(Boolean).join(" ") || profile.username || sub.leaderName
+                    : sub.leaderName;
+
+                return {
+                    ...sub,
+                    leaderFullName,
+                    leaderPhone: sub.leaderPhone || profile?.phone || "N/A"
+                };
             })
         );
 
@@ -65,7 +76,7 @@ export async function GET(req: Request) {
         };
 
         return NextResponse.json({
-            submissions: submissionsWithPhone,
+            submissions: enrichedSubmissions,
             stats,
         });
     } catch (error) {

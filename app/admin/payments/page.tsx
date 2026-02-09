@@ -15,6 +15,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
+interface Member {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    username?: string;
+}
+
 interface PaymentEvent {
     eventId: {
         _id: string;
@@ -23,7 +30,7 @@ interface PaymentEvent {
         fees: number;
         category: string;
     };
-    selectedMembers: string[];
+    selectedMembers: Member[];
 }
 
 interface PaymentSubmission {
@@ -36,6 +43,7 @@ interface PaymentSubmission {
     status: "pending" | "verified" | "rejected";
     leaderEmail: string;
     leaderName: string;
+    leaderFullName?: string;
     leaderPhone: string;
     teamId?: { name: string };
     rejectionReason?: string;
@@ -252,7 +260,7 @@ export default function AdminPaymentsPage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                                             <div>
                                                 <span className="text-zinc-500 block text-xs uppercase mb-1">Leader</span>
-                                                <span className="text-white font-bold">{sub.leaderName}</span>
+                                                <span className="text-white font-bold">{sub.leaderFullName || sub.leaderName}</span>
                                                 <div className="flex flex-col text-xs">
                                                     <span className="text-zinc-400">{sub.leaderEmail}</span>
                                                     <span className="text-[#00F0FF] mt-0.5">{sub.leaderPhone}</span>
@@ -276,16 +284,39 @@ export default function AdminPaymentsPage() {
 
                                         {/* Events */}
                                         <div className="mt-4">
-                                            <span className="text-zinc-500 block text-xs uppercase mb-2">Events</span>
-                                            <div className="flex flex-wrap gap-2">
-                                                {sub.events.map((e, i) => (
-                                                    <span
-                                                        key={i}
-                                                        className="px-2 py-1 bg-zinc-800 rounded text-xs text-zinc-300"
-                                                    >
-                                                        {e.eventId?.title || "Unknown"} (₹{e.eventId?.fees || 0})
-                                                    </span>
-                                                ))}
+                                            <span className="text-zinc-500 block text-xs uppercase mb-2">Events & Members</span>
+                                            <div className="grid grid-cols-1 gap-3">
+                                                {sub.events.map((e, i) => {
+                                                    const fees = e.eventId?.fees || 0;
+                                                    const title = e.eventId?.title || "Unknown Event";
+                                                    
+                                                    return (
+                                                        <div key={i} className="bg-zinc-900/50 border border-white/5 rounded-lg p-3">
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <span className="text-white font-bold text-xs">{title}</span>
+                                                                <span className="text-zinc-500 text-[10px]">₹{fees}</span>
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-1.5">
+                                                                {e.selectedMembers?.length > 0 ? (
+                                                                    e.selectedMembers.map((member) => {
+                                                                        const fullName = [member.firstName, member.lastName].filter(Boolean).join(" ");
+                                                                        return (
+                                                                            <span 
+                                                                                key={member._id}
+                                                                                title={member.username}
+                                                                                className="px-2 py-0.5 bg-zinc-800 rounded text-[10px] text-zinc-400 border border-white/5"
+                                                                            >
+                                                                                {fullName || member.username || "Unknown Member"}
+                                                                            </span>
+                                                                        );
+                                                                    })
+                                                                ) : (
+                                                                    <span className="text-zinc-600 text-[10px] italic">No members listed</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
 
