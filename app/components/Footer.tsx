@@ -3,14 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Terminal,
-  Shield,
-  Linkedin,
-  Instagram,
-  Twitter,
-  Linkedin,
-} from "lucide-react";
+import { Terminal, Shield, Linkedin, Instagram, Twitter } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -18,7 +11,6 @@ const Footer = () => {
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00F0FF]/50 to-transparent" />
       <div className="container mx-auto px-6 pt-16 pb-32">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-0">
-
           {/* Left: Logo */}
           <div className="flex items-center gap-2 group">
             <div className="relative w-10 h-10">
@@ -65,7 +57,20 @@ const Footer = () => {
                 className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-[#FF003C] hover:border-[#FF003C] transition-all"
               >
                 {/* Replaced with a generic video icon if Youtube component isn't available, or use Lucide's Youtube if imported. Assuming generic social icons for now based on previous file content */}
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" /><path d="m10 15 5-3-5-3z" /></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
+                  <path d="m10 15 5-3-5-3z" />
+                </svg>
               </Link>
               <Link
                 href="https://x.com/roborumble1"
