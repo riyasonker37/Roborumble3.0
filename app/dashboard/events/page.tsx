@@ -118,7 +118,6 @@ const HorizontalEventCard = ({
   teamData: any;
   isInCart: boolean;
   addingToCart: boolean;
-  onShowClosedDialog: () => void;
 }) => {
   const [showRosterDialog, setShowRosterDialog] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
@@ -147,11 +146,6 @@ const HorizontalEventCard = ({
   }, [teamData]);
 
   const handleRegisterClick = () => {
-    // DISABLE REGISTRATIONS
-    onShowClosedDialog();
-    return;
-
-    /*
     if (isTeamEvent && !teamData?.team) {
       alert(
         "This event requires a team. Please create a team in the 'Team' tab first.",
@@ -177,7 +171,6 @@ const HorizontalEventCard = ({
       // Individual event - add to cart directly
       onAddToCart(event.eventId);
     }
-    */
   };
 
   const handleConfirmRoster = () => {
@@ -452,7 +445,6 @@ export default function DashboardEventsPage() {
   const [loading, setLoading] = useState(true);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
   const [message, setMessage] = useState({ type: "", text: "" });
-  const [showClosedDialog, setShowClosedDialog] = useState(false);
 
   // Cart state
   const [cartItems, setCartItems] = useState<string[]>([]);
@@ -666,35 +658,6 @@ export default function DashboardEventsPage() {
         </div>
       )}
 
-      {/* Registration Closed Dialog */}
-      {showClosedDialog && (
-        <div className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#111] border border-red-500/50 p-8 rounded-2xl shadow-[0_0_50px_rgba(239,68,68,0.2)] max-w-md w-full text-center relative">
-            <button
-              onClick={() => setShowClosedDialog(false)}
-              className="absolute top-4 right-4 text-zinc-500 hover:text-white"
-            >
-              <XCircle size={24} />
-            </button>
-            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="text-red-500" size={32} />
-            </div>
-            <h3 className="text-xl font-black text-white font-mono mb-2 uppercase">
-              Registrations Closed
-            </h3>
-            <p className="text-zinc-400 font-mono text-sm leading-relaxed">
-              Registration is not open yet. Please check back later for updates.
-            </p>
-            <button
-              onClick={() => setShowClosedDialog(false)}
-              className="mt-6 w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold font-mono rounded-xl transition-all uppercase"
-            >
-              Generic_Acknowledge
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Overloading screen if registering */}
       {addingToCart && (
         <div className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-md flex items-center justify-center">
@@ -722,7 +685,6 @@ export default function DashboardEventsPage() {
               teamData={teamData}
               isInCart={isEventInCart(event.eventId)}
               addingToCart={addingToCart === event.eventId}
-              onShowClosedDialog={() => setShowClosedDialog(true)}
             />
           ))}
         </div>

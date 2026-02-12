@@ -9,7 +9,7 @@ import Registration from "@/app/models/Registration";
 import PaymentSubmission from "@/app/models/PaymentSubmission";
 
 // UPI Configuration
-const UPI_ID = "oscuragamer1-2@okaxis";
+const UPI_ID = "kumaraakshant2005@oksbi";
 const UPI_NAME = "Robo Rumble";
 
 // POST - Submit payment proof
