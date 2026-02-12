@@ -1,13 +1,13 @@
-import nodemailer from "nodemailer";
+import * as nodemailer from "nodemailer";
 
-// Email configuration - uses environment variables
+// Email configuration - TEMPORARY HARDCODED FIX for hosting
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: parseInt(process.env.SMTP_PORT || "587"),
-    secure: process.env.SMTP_SECURE === "true",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, 
     auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: "roborumble@csjmu.ac.in",
+        pass: "opgywemuyiythmuo",
     },
 });
 
@@ -19,15 +19,18 @@ interface EmailOptions {
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
     try {
+        const user = "roborumble@csjmu.ac.in";
+        const pass = "opgywemuyiythmuo";
+
         // Check if SMTP is configured
-        if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+        if (!user || !pass) {
             console.log("Email not configured - skipping send to:", options.to);
             console.log("Subject:", options.subject);
             return true; // Return true to not block the flow
         }
 
         await transporter.sendMail({
-            from: `"Robo Rumble" <${process.env.SMTP_USER}>`,
+            from: `"Robo Rumble" <${user}>`,
             to: options.to,
             subject: options.subject,
             html: options.html,
@@ -150,4 +153,52 @@ export async function sendPaymentRejectedEmail(
         subject: "❌ Payment Rejected - Robo Rumble Registration",
         html,
     });
+}
+// @ts-expect-error - @react-email/render v2 types can sometimes be missing in certain TS configs
+import { render } from '@react-email/render';
+import { RegistrationApprovedEmail } from '@/app/emails/RegistrationApproved';
+
+export async function sendApprovalEmails(
+    eventDetails: { name: string, fees: number, brochureLink?: string },
+    participants: { name: string, email: string, transactionId: string }[]
+) {
+    try {
+        const user = "roborumble@csjmu.ac.in";
+        const pass = "opgywemuyiythmuo";
+
+        if (!user || !pass) {
+            console.log("SMTP not configured - skipping approval emails");
+            return { success: true };
+        }
+
+        const results = await Promise.all(participants.map(async (userItem) => {
+            try {
+                const htmlContent = await render(RegistrationApprovedEmail({
+                    userName: userItem.name,
+                    eventName: eventDetails.name,
+                    transactionId: userItem.transactionId,
+                    amount: `₹${eventDetails.fees}`,
+                    brochureUrl: eventDetails.brochureLink || 'https://roborumble.org/events',
+                }));
+
+                await transporter.sendMail({
+                    from: `"Robo Rumble Team" <${user}>`,
+                    to: userItem.email,
+                    subject: `Approved: ${eventDetails.name} Registration 🤖`,
+                    html: htmlContent,
+                });
+
+                console.log(`Approval email sent to: ${userItem.email}`);
+                return { email: userItem.email, success: true };
+            } catch (err) {
+                console.error(`Failed to send email to ${userItem.email}:`, err);
+                return { email: userItem.email, success: false, error: err };
+            }
+        }));
+
+        return { success: true, results };
+    } catch (error) {
+        console.error("sendApprovalEmails general error:", error);
+        return { success: false, error };
+    }
 }

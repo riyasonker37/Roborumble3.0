@@ -1,25 +1,32 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Profile from "@/app/models/Profile";
-import { auth } from "@clerk/nextjs/server";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+import AuthUser from "@/app/models/AuthUser";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const { userId: clerkId } = await auth();
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token");
 
-        if (!clerkId) {
+        if (!token) {
             return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
         }
 
-        await connectDB();
+        // Verify Token
+        const decoded = jwt.verify(
+            token.value,
+            process.env.JWT_SECRET || "default_secret"
+        ) as { userId: string, role: string };
 
-        // Check if requester is admin/superadmin
-        const adminProfile = await Profile.findOne({ clerkId });
-        if (!adminProfile || !["admin", "superadmin"].includes(adminProfile.role)) {
+        if (!["ADMIN", "SUPERADMIN"].includes(decoded.role?.toUpperCase())) {
             return NextResponse.json({ error: "FORBIDDEN: ADMIN_ACCESS_ONLY" }, { status: 403 });
         }
+
+        await connectDB();
 
         // Fetch all profiles
         const allProfiles = await Profile.find()
@@ -44,19 +51,24 @@ export async function GET() {
 
 export async function DELETE(req: Request) {
     try {
-        const { userId: adminClerkId } = await auth();
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token");
 
-        if (!adminClerkId) {
+        if (!token) {
             return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
         }
 
-        await connectDB();
+        // Verify Token
+        const decoded = jwt.verify(
+            token.value,
+            process.env.JWT_SECRET || "default_secret"
+        ) as { userId: string, role: string };
 
-        // Verify Admin
-        const adminProfile = await Profile.findOne({ clerkId: adminClerkId });
-        if (!adminProfile || !["admin", "superadmin"].includes(adminProfile.role)) {
+        if (!["ADMIN", "SUPERADMIN"].includes(decoded.role?.toUpperCase())) {
             return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
         }
+
+        await connectDB();
 
         const { userId } = await req.json();
 

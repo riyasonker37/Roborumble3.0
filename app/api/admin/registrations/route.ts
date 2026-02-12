@@ -5,6 +5,10 @@ import Profile from "@/app/models/Profile";
 import Team from "@/app/models/Team";
 import Event from "@/app/models/Event";
 
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+import AuthUser from "@/app/models/AuthUser";
+
 export const dynamic = "force-dynamic";
 
 // Force import to register models
@@ -14,19 +18,23 @@ void Event;
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
-        const clerkId = searchParams.get("clerkId");
         const eventId = searchParams.get("eventId");
         const status = searchParams.get("status");
 
-        if (!clerkId) {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token");
+
+        if (!token) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        await connectDB();
+        // Verify Token
+        const decoded = jwt.verify(
+            token.value,
+            process.env.JWT_SECRET || "default_secret"
+        ) as { userId: string, role: string };
 
-        // Verify Admin Role
-        const profile = await Profile.findOne({ clerkId });
-        if (!profile || !["admin", "superadmin"].includes(profile.role)) {
+        if (!["ADMIN", "SUPERADMIN"].includes(decoded.role?.toUpperCase())) {
             return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
 

@@ -1,33 +1,82 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import connectDB from "@/lib/mongodb";
-import { sendPaymentVerifiedEmail, sendPaymentRejectedEmail } from "@/lib/email";
+import { sendPaymentVerifiedEmail, sendPaymentRejectedEmail, sendApprovalEmails } from "@/lib/email";
 import PaymentSubmission from "@/app/models/PaymentSubmission";
 import Registration from "@/app/models/Registration";
 import Profile from "@/app/models/Profile";
 import Event from "@/app/models/Event";
 import Team from "@/app/models/Team";
 
-// Admin clerk IDs - add your admin clerk IDs here
-const ADMIN_IDS = ["user_2xFw5kJ3hBjNDVPyaB9tXwLYQr"]; // Replace with actual admin IDs
+
+// GET - List all payment submissions
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+
+interface PopulatedMember {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    username?: string;
+    phone?: string;
+}
+
+interface PopulatedEvent {
+    _id: string;
+    title: string;
+    fees: number;
+    eventId: string;
+    category: string;
+    brochureLink?: string;
+}
+
+interface EnrichedSubmission {
+    _id: string;
+    clerkId: string;
+    transactionId: string;
+    screenshotUrl: string;
+    totalAmount: number;
+    status: string;
+    leaderEmail: string;
+    leaderName: string;
+    leaderFullName?: string;
+    leaderPhone: string;
+    teamId?: { name: string };
+    rejectionReason?: string;
+    createdAt: string;
+    events: {
+        eventId: PopulatedEvent;
+        selectedMembers: PopulatedMember[];
+    }[];
+}
 
 // GET - List all payment submissions
 export async function GET(req: Request) {
     try {
-        const { userId: clerkId } = await auth();
-        if (!clerkId) {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token");
+
+        if (!token) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        // Check if admin (you may want to implement proper admin check)
-        // For now, allow any authenticated user to view (adjust as needed)
+        // Verify Token
+        const decoded = jwt.verify(
+            token.value,
+            process.env.JWT_SECRET || "default_secret"
+        ) as { userId: string, role: string };
+
+
+        if (!["ADMIN", "SUPERADMIN"].includes(decoded.role?.toUpperCase())) {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
 
         const { searchParams } = new URL(req.url);
         const status = searchParams.get("status"); // pending, verified, rejected, or all
 
         await connectDB();
 
-        const filter: any = {};
+        const filter: Record<string, string> = {};
         if (status && status !== "all") {
             filter.status = status;
         }
@@ -54,8 +103,8 @@ export async function GET(req: Request) {
 
         // Enrich with leaderFullName and handle fallback for leaderPhone
         const enrichedSubmissions = await Promise.all(
-            submissions.map(async (sub: any) => {
-                const profile = await Profile.findOne({ clerkId: sub.clerkId }).select("firstName lastName username phone");
+            (submissions as unknown as EnrichedSubmission[]).map(async (sub) => {
+                const profile = await Profile.findOne({ clerkId: sub.clerkId }).select("firstName lastName username phone") as PopulatedMember | null;
 
                 const leaderFullName = profile
                     ? [profile.firstName, profile.lastName].filter(Boolean).join(" ") || profile.username || sub.leaderName
@@ -73,6 +122,10 @@ export async function GET(req: Request) {
             pending: await PaymentSubmission.countDocuments({ status: "pending" }),
             verified: await PaymentSubmission.countDocuments({ status: "verified" }),
             rejected: await PaymentSubmission.countDocuments({ status: "rejected" }),
+            totalRevenue: (await PaymentSubmission.aggregate([
+                { $match: { status: "verified" } },
+                { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+            ]))[0]?.total || 0
         };
 
         return NextResponse.json({
@@ -91,26 +144,26 @@ export async function GET(req: Request) {
 // POST - Verify or reject a payment
 export async function POST(req: Request) {
     try {
-        const { userId: clerkId } = await auth();
-        if (!clerkId) {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token");
+
+        if (!token) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        // Verify Token
+        const decoded = jwt.verify(
+            token.value,
+            process.env.JWT_SECRET || "default_secret"
+        ) as { userId: string, role: string };
+
+        const clerkId = decoded.userId;
+
+        if (!["ADMIN", "SUPERADMIN"].includes(decoded.role?.toUpperCase())) {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+
         const { submissionId, action, rejectionReason } = await req.json();
-
-        if (!submissionId || !action) {
-            return NextResponse.json(
-                { error: "Submission ID and action are required" },
-                { status: 400 }
-            );
-        }
-
-        if (!["verify", "reject"].includes(action)) {
-            return NextResponse.json(
-                { error: "Action must be 'verify' or 'reject'" },
-                { status: 400 }
-            );
-        }
 
         await connectDB();
 
@@ -139,7 +192,7 @@ export async function POST(req: Request) {
             // Update all related registrations to manual_verified
             for (const eventItem of submission.events) {
                 console.log(`Verifying event ${eventItem.eventId} for submission ${submission._id}`);
-                
+
                 // Primary update attempt using paymentSubmissionId
                 let reg = await Registration.findOneAndUpdate(
                     {
@@ -156,7 +209,7 @@ export async function POST(req: Request) {
                 // Fallback: Try finding by Team ID or User logic if primary failed
                 if (!reg) {
                     console.warn(`Primary update failed for ${eventItem.eventId}. Trying fallback...`);
-                    const fallbackQuery: any = {
+                    const fallbackQuery: Record<string, unknown> = {
                         eventId: eventItem.eventId,
                         paymentStatus: { $in: ["verification_pending", "pending", "initiated"] }
                     };
@@ -173,7 +226,7 @@ export async function POST(req: Request) {
                             fallbackQuery.selectedMembers = profile._id;
                         }
                     }
-                    
+
                     if (fallbackQuery.teamId || fallbackQuery.selectedMembers) {
                         reg = await Registration.findOneAndUpdate(
                             fallbackQuery,
@@ -182,11 +235,11 @@ export async function POST(req: Request) {
                                 paymentSubmissionId: submission._id, // Link it now
                                 amountPaid: submission.totalAmount / submission.events.length,
                             },
-                             { new: true }
+                            { new: true }
                         );
                     }
                 }
-                
+
                 if (reg) {
                     console.log(`Registration updated: ${reg._id}`);
                 } else {
@@ -211,24 +264,56 @@ export async function POST(req: Request) {
                 }
             );
 
-            // Get event titles for email
-            const populatedSubmission = await PaymentSubmission.findById(submissionId).populate({
-                path: "events.eventId",
-                model: Event,
-                select: "title",
-            });
-            const eventTitles = populatedSubmission?.events.map((e: any) => e.eventId?.title || "Event") || [];
+            // NEW: Send detailed approval emails to ALL members using Resend
+            try {
+                const fullSubmission = (await PaymentSubmission.findById(submissionId)
+                    .populate({
+                        path: "events.eventId",
+                        model: Event,
+                        select: "title fees brochureLink guidelines",
+                    })
+                    .populate({
+                        path: "events.selectedMembers",
+                        model: Profile,
+                        select: "firstName lastName email username",
+                    })
+                    .lean()) as unknown as EnrichedSubmission;
 
-            // Send verification email
-            await sendPaymentVerifiedEmail(
-                submission.leaderEmail,
-                submission.leaderName,
-                eventTitles,
-                submission.totalAmount
-            );
+                if (fullSubmission) {
+                    for (const eventItem of fullSubmission.events) {
+                        const eventDetails = {
+                            name: eventItem.eventId?.title || "Event",
+                            fees: eventItem.eventId?.fees || 0,
+                            brochureLink: eventItem.eventId?.brochureLink,
+                        };
+
+                        const participants = (eventItem.selectedMembers as unknown as PopulatedMember[]).map((m) => ({
+                            name: [m.firstName, m.lastName].filter(Boolean).join(" ") || m.username || "Participant",
+                            email: m.email || "",
+                            transactionId: fullSubmission.transactionId,
+                        })).filter(p => p.email);
+
+                        if (participants.length > 0) {
+                            await sendApprovalEmails(eventDetails, participants);
+                        }
+                    }
+
+                    // Legacy notification for leader using populated data
+                    const eventTitles = fullSubmission.events.map((e) => e.eventId?.title || "Event");
+                    await sendPaymentVerifiedEmail(
+                        fullSubmission.leaderEmail,
+                        fullSubmission.leaderName,
+                        eventTitles,
+                        fullSubmission.totalAmount
+                    );
+                }
+            } catch (emailError) {
+                console.error("Automated batch email failed:", emailError);
+                // Non-blocking error for the main verification flow
+            }
 
             return NextResponse.json({
-                message: "Payment verified successfully",
+                message: "Payment verified and approval emails sent",
                 email: submission.leaderEmail,
             });
         } else {

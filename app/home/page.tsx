@@ -456,7 +456,7 @@ export default function Home() {
   ];
   const stats = [
     {
-      title: "10+",
+      title: "10",
       subtitle: "ACTIVE_EVENTS",
       desc: "From Robo Wars to Esports",
       icon: <Shield size={20} />,

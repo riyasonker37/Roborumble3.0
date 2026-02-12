@@ -458,7 +458,7 @@ export default function DashboardPage() {
                     {[
                       "Profile Completeness: A complete profile (including Name, Username, Mobile, College, and academic details) is mandatory for creating or joining a team.",
                       "Unique Team Identity: Every team must have a unique name. Case-insensitive duplicates are not permitted during creation.",
-                      "Institutional Unity: All members must belong to the same college. Cross-college teams are strictly not permitted.",
+                      "Institutional Unity: All members must belong to the same college. The college name must match EXACTLY (e.g., if one uses 'ABC College', all must use 'ABC College'). If one uses an abbreviation, all must use the same abbreviation. Even a single letter difference will prevent you from joining the team.",
                       "Team Capacity: Teams can have a maximum of 50 members, though individual event requirements may vary.",
                       "Exclusive Membership: A student cannot be a member of more than one team simultaneously.",
                     ].map((rule, i) => (

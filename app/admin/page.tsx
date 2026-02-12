@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
@@ -37,7 +37,7 @@ interface RegistrationData {
 }
 
 export default function AdminPage() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [registrations, setRegistrations] = useState<RegistrationData[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -51,7 +51,6 @@ export default function AdminPage() {
     if (!user?.id) return;
     try {
       const params = new URLSearchParams({
-        clerkId: user.id,
         ...(statusFilter !== "all" && { status: statusFilter }),
       });
 

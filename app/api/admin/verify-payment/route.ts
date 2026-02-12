@@ -4,23 +4,33 @@ import Registration from "@/app/models/Registration";
 import Profile from "@/app/models/Profile";
 import Team from "@/app/models/Team";
 
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+import AuthUser from "@/app/models/AuthUser";
+
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-        const { clerkId, registrationId, action, notes } = body;
-        // action: "verify" | "reject"
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token");
 
-        if (!clerkId || !registrationId || !action) {
-            return NextResponse.json({ message: "Invalid request" }, { status: 400 });
+        if (!token) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        await connectDB();
+        // Verify Token
+        const decoded = jwt.verify(
+            token.value,
+            process.env.JWT_SECRET || "default_secret"
+        ) as { userId: string, role: string };
 
-        // Verify Admin Role
-        const adminProfile = await Profile.findOne({ clerkId });
-        if (!adminProfile || !["admin", "superadmin"].includes(adminProfile.role)) {
+        if (!["ADMIN", "SUPERADMIN"].includes(decoded.role?.toUpperCase())) {
             return NextResponse.json({ message: "Forbidden" }, { status: 403 });
         }
+
+        const body = await req.json();
+        const { registrationId, action, notes } = body;
+
+        await connectDB();
 
         const registration = await Registration.findById(registrationId);
         if (!registration) {
@@ -31,7 +41,7 @@ export async function POST(req: Request) {
             await Registration.findByIdAndUpdate(registrationId, {
                 paymentStatus: "manual_verified",
                 manualVerification: {
-                    verifiedBy: adminProfile._id,
+                    verifiedBy: decoded.userId,
                     verifiedAt: new Date(),
                     notes: notes || "Manually verified by admin",
                 },
@@ -47,7 +57,7 @@ export async function POST(req: Request) {
             await Registration.findByIdAndUpdate(registrationId, {
                 paymentStatus: "failed",
                 manualVerification: {
-                    verifiedBy: adminProfile._id,
+                    verifiedBy: decoded.userId,
                     verifiedAt: new Date(),
                     notes: notes || "Rejected by admin",
                 },
