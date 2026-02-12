@@ -106,7 +106,6 @@ const HorizontalEventCard = ({
   teamData,
   isInCart,
   addingToCart,
-  onShowClosedDialog,
 }: {
   event: EventData;
   registration?: RegistrationStatus;  

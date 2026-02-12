@@ -4,7 +4,7 @@ import * as nodemailer from "nodemailer";
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
-    secure: true, 
+    secure: true,
     auth: {
         user: "roborumble@csjmu.ac.in",
         pass: "opgywemuyiythmuo",
@@ -154,7 +154,7 @@ export async function sendPaymentRejectedEmail(
         html,
     });
 }
-// @ts-expect-error - @react-email/render v2 types can sometimes be missing in certain TS configs
+// @ts-ignore - module resolves at build time but IDE may not find type declarations
 import { render } from '@react-email/render';
 import { RegistrationApprovedEmail } from '@/app/emails/RegistrationApproved';
 
